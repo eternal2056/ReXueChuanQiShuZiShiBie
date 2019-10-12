@@ -49,7 +49,7 @@ def main(function):
     # 设置键盘“钩子”
     hm.HookKeyboard()
     # 监听所有鼠标事件
-    hm.MouseLeftDown = function
+    hm.MouseLeftUp = function
     # 设置鼠标“钩子”
     hm.HookMouse()
     # 进入循环，如不手动关闭，程序将一直处于监听状态
