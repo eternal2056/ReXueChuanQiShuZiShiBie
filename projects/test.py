@@ -1,30 +1,35 @@
-from numpy import *
-from PIL import ImageGrab
-from number_my import *
-import const_my
-import pyHook_test
-import operation
-
 import time
-import win32api,win32gui,win32con
 from ctypes import *
 
-def clickLeftCur():
-   win32api.mouse_event(
-    win32con.MOUSEEVENTF_LEFTDOWN|
-   win32con.MOUSEEVENTF_LEFTUP, 0, 0)
+import win32api
+import win32con
+from PIL import ImageGrab
+from numpy import *
 
-def moveCurPos(x,y):
+import const_my
+import pyHook_test
+from number_my import *
+
+
+def clickLeftCur():
+    win32api.mouse_event(
+        win32con.MOUSEEVENTF_LEFTDOWN |
+        win32con.MOUSEEVENTF_LEFTUP, 0, 0)
+
+
+def moveCurPos(x, y):
     windll.user32.SetCursorPos(x, y)
+
 
 def click_left(x, y):
     moveCurPos(x, y)
     x1 = time.time()
-    print('之前的时间:',x1)
+    print('之前的时间:', x1)
     clickLeftCur()
     y1 = time.time()
-    print('之后的时间:',y1)
-    print("之间差",y1-x1)
+    print('之后的时间:', y1)
+    print("之间差", y1 - x1)
+
 
 COLOR_LIMIT = 160
 ICON = '1'
@@ -32,6 +37,8 @@ BLANK = '0'
 WIDTH = 6
 BORDER = 1
 COLON = 2
+
+
 # 获取坐标RGB [46, 176, 255]
 
 
@@ -146,7 +153,7 @@ def number_search(rule, trans):
     bit = len(rule)
     number_search_number = 0
     # 游戏显示数字
-    for i in range(len(rule)): # [i] => [0,1,2,3,4,5]
+    for i in range(len(rule)):  # [i] => [0,1,2,3,4,5]
         # 0~9所有数字
         right_list = []
         for number_10 in range(10):
@@ -158,7 +165,7 @@ def number_search(rule, trans):
                 for j in range(len(rule[i])):  # [i][j] => 0
                     # 数字的点数
                     for a in range(9):  # trans[rule[i][j]][a] => 1 或 0
-                        if (number_10  == 0 or number_10 == 8) and (j == 1 or j == 2 or j == 3 or j == 4) and a == 4:
+                        if (number_10 == 0 or number_10 == 8) and (j == 1 or j == 2 or j == 3 or j == 4) and a == 4:
                             if trans[rule[i][j]][a] == number_10_list[number_10][j + number_col_5][a]:
                                 right_temp += 2
                                 continue
@@ -175,11 +182,11 @@ def number_search(rule, trans):
                     right = right_temp
             right_list.append(right)
         right = right_list.index(max(right_list))
-        number_search_number += (10 **(bit - i - 1)) * right
+        number_search_number += (10 ** (bit - i - 1)) * right
     return number_search_number
 
-def compute_other(all_people_xy, people_1):
 
+def compute_other(all_people_xy, people_1):
     people_1_x = all_people_xy[0][0]
     people_1_y = all_people_xy[0][1]
     people_2_x = all_people_xy[1][0]
@@ -188,24 +195,25 @@ def compute_other(all_people_xy, people_1):
     people_3_y = all_people_xy[2][1]
 
     # print(const_my.people_2_list)
-    people_2_x_up = (people_1_x - people_2_x) * 24 + const_my.people_2_list[0]
-    people_2_y_up = (people_1_y - people_2_y) * 37
+    people_2_x_up = (people_1_x - people_2_x) * 37 + const_my.people_2_list[0]
+    people_2_y_up = (people_1_y - people_2_y) * 24
 
-    people_3_x_up = (people_1_x - people_3_x) * 24
-    people_3_y_up = (people_1_y - people_3_y) * 37 + const_my.people_3_list[1]
+    people_3_x_up = (people_1_x - people_3_x) * 37
+    people_3_y_up = (people_1_y - people_3_y) * 24 + const_my.people_3_list[1]
     # operation.operation.click_left(people_1[0], people_1[1])
     click_left(people_1[0] + people_2_x_up, people_1[1] + people_2_y_up)
     click_left(people_1[0] + people_3_x_up, people_1[1] + people_3_y_up)
 
 
-
 # 主程序
-def main(event):
+def main(hm, event):
     print("检测到点击事件！")
+    print(time.time())
     people_1 = list(event.Position)
     if people_1[0] > 922 or people_1[1] > 524:
         return True
     all_people_xy = []
+    hm.UnhookMouse()
     # print(people_1)
     # 获取全屏截图
     px = ImageGrab.grab().load()
@@ -232,9 +240,9 @@ def main(event):
         all_people_xy.append([x_location, y_location])
         # print(x_location,y_location)
 
-
     print(all_people_xy)
     compute_other(all_people_xy, people_1)
+    hm.HookMouse()
     pyHook_test.pyHook_p += 1
     return True
 

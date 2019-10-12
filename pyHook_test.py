@@ -1,5 +1,5 @@
 import pythoncom
-import pyHook
+import PyHook3 as pyHook
 
 global position
 position = []
@@ -45,17 +45,14 @@ def main(function):
     # 创建一个“钩子”管理对象
     hm = pyHook.HookManager()
     # 监听所有键盘事件
-    hm.KeyDown = onKeyboardEvent
+    # hm.KeyDown = onKeyboardEvent
     # 设置键盘“钩子”
-    hm.HookKeyboard()
+    # hm.HookKeyboard()
     # 监听所有鼠标事件
-    hm.MouseLeftUp = function
+    hm.MouseLeftUp = lambda x: function(hm, x)
     # 设置鼠标“钩子”
     hm.HookMouse()
+
+
     # 进入循环，如不手动关闭，程序将一直处于监听状态
-    if pyHook_p == 0:
-        pythoncom.PumpMessages()
-
-
-if __name__ == "__main__":
-    main()
+    pythoncom.PumpMessages()
