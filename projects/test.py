@@ -20,9 +20,11 @@ def moveCurPos(x,y):
 def click_left(x, y):
     moveCurPos(x, y)
     x1 = time.time()
+    print('之前的时间:',x1)
     clickLeftCur()
     y1 = time.time()
-    print(y1 - x1)
+    print('之后的时间:',y1)
+    print("之间差",y1-x1)
 
 COLOR_LIMIT = 160
 ICON = '1'
