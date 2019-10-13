@@ -1,21 +1,21 @@
 import time
 from ctypes import *
-
 import win32api
 import win32con
 from PIL import ImageGrab
 from numpy import *
-
 import const_my
-import pyHook_test
 from number_my import *
 
 
 def clickLeftCur():
-    win32api.mouse_event(
-        win32con.MOUSEEVENTF_LEFTDOWN |
-        win32con.MOUSEEVENTF_LEFTUP, 0, 0)
-
+    x1 = time.time()
+    # print('之前的时间:', x1)
+    win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0)
+    win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0, 0, 0)
+    y1 = time.time()
+    # print('之后的时间:', y1)
+    print("时间差：", y1 - x1)
 
 def moveCurPos(x, y):
     windll.user32.SetCursorPos(x, y)
@@ -23,12 +23,7 @@ def moveCurPos(x, y):
 
 def click_left(x, y):
     moveCurPos(x, y)
-    x1 = time.time()
-    print('之前的时间:', x1)
     clickLeftCur()
-    y1 = time.time()
-    print('之后的时间:', y1)
-    print("之间差", y1 - x1)
 
 
 COLOR_LIMIT = 160
@@ -203,19 +198,22 @@ def compute_other(all_people_xy, people_1):
     # operation.operation.click_left(people_1[0], people_1[1])
     click_left(people_1[0] + people_2_x_up, people_1[1] + people_2_y_up)
     click_left(people_1[0] + people_3_x_up, people_1[1] + people_3_y_up)
+    click_left(people_1[0] + people_3_x_up, people_1[1] + people_3_y_up)
 
 
 # 主程序
-def main(hm, event):
-    print("检测到点击事件！")
-    print(time.time())
-    people_1 = list(event.Position)
+def main():
+    # print("检测到点击事件！")
+    people_1 = list(win32api.GetCursorPos())
     if people_1[0] > 922 or people_1[1] > 524:
         return True
+    click_left(people_1[0], people_1[1])
     all_people_xy = []
-    hm.UnhookMouse()
     # print(people_1)
     # 获取全屏截图
+
+    click_left(0,0)
+
     px = ImageGrab.grab().load()
     for coordinate_i in range(len(const_my.coordinates)):
         trans = []
@@ -229,7 +227,7 @@ def main(hm, event):
         trans = transpose(number_list)
         center = get_center(trans)
         black_list = get_black(trans)
-        # print(center)Q
+        # print(center)
         # print(black_list)
         number_list_each_out = get_number_location(center, black_list)
         # print(number_list_each_out)
@@ -242,9 +240,19 @@ def main(hm, event):
 
     print(all_people_xy)
     compute_other(all_people_xy, people_1)
-    hm.HookMouse()
-    pyHook_test.pyHook_p += 1
+    moveCurPos(people_1[0], people_1[1])
     return True
 
-
-pyHook_test.main(main)
+state_left = win32api.GetKeyState(0x01)
+state_right = win32api.GetKeyState(0x02)
+if __name__ == '__main__':
+    while True:
+        a = win32api.GetKeyState(0x01)
+        b = win32api.GetKeyState(0x02)
+        # print('a', a)
+        if a != state_left:  # Button state changed
+            state_left = a
+            # print('a', a)
+            if a < 0:
+                main()
+        time.sleep(0.001)
